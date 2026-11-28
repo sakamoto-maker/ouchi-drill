@@ -16,7 +16,7 @@ async function open_(pw,auto){const m=$("msg");m.style.color="#666";m.textConten
   if($("rem").checked)try{localStorage.setItem("od-pw",pw)}catch(_){}
   const rk=await crypto.subtle.importKey("pkcs8",priv,{name:"RSA-OAEP",hash:"SHA-256"},false,["decrypt"]);
   m.textContent="よみこんでいます…";
-  const b=await get("payload.bin",0); const n=(b[4]<<8)|b[5]; const wk=b.slice(6,6+n), iv=b.slice(6+n,18+n), ct=b.slice(18+n);
+  let b;try{const pj=await get("payload.json",1);const parts=[];let tot=0;for(let i=0;i<pj.n;i++){m.textContent="よみこんでいます… "+(i+1)+"/"+pj.n;const p=await get("payload."+i+".bin",0);parts.push(p);tot+=p.length;}b=new Uint8Array(tot);let o=0;for(const p of parts){b.set(p,o);o+=p.length;}}catch(e){b=await get("payload.bin",0);} const n=(b[4]<<8)|b[5]; const wk=b.slice(6,6+n), iv=b.slice(6+n,18+n), ct=b.slice(18+n);
   const raw=await crypto.subtle.decrypt({name:"RSA-OAEP"},rk,wk);
   const ak=await crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["decrypt"]);
   const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv},ak,ct);
